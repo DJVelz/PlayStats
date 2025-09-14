@@ -1,6 +1,8 @@
 import requests
 import sqlite3
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
+from matplotlib.ticker import FuncFormatter
 from datetime import datetime
 
 conn = sqlite3.connect("steam_games.db")
@@ -58,7 +60,7 @@ for game in top_games:
     cursor.execute("""
     INSERT INTO popularity (app_id, rank_position, peak_in_game)
     VALUES (?, ?, ?)
-    """, (app_id, rank, peak))
+    """, (app_id, rank, int(peak)))
 
 
     print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Price: ${price}")
@@ -84,6 +86,9 @@ plt.xlabel("Peak Players")
 plt.ylabel("Game")
 plt.title("Top 10 Most Played Steam Games (Peak Players)")
 plt.gca().invert_yaxis()  # highest peak on top
+def thousands(x, pos):
+    return f'{int(x/1000)}k'
+plt.gca().xaxis.set_major_formatter(FuncFormatter(thousands))
 plt.show()
 
 conn.close()
