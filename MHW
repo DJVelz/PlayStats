@@ -5,3 +5,23 @@ from datetime import datetime
 
 conn = sqlite3.connect("steam_games.db")
 cursor = conn.cursor
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS games (
+    app_id INTEGER PRIMARY KEY,
+    name TEXT,
+    genre TEXT,
+    price REAL,
+    release_date TEXT
+)
+""")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS popularity (
+    app_id INTEGER,
+    timestamp TEXT,
+    player_count INTEGER,
+    FOREIGN KEY (app_id) REFERENCES games(app_id)
+)
+""")
+
