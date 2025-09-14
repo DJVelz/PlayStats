@@ -47,3 +47,16 @@ else:
 # Get current player count
 players_response = requests.get(players_url).json()
 player_count = players_response.get("response", {}).get("player_count", 0)
+
+# --- Step 3: Insert into SQLite ---
+cursor.execute("""
+INSERT OR REPLACE INTO games (app_id, name, genre, price, release_date)
+VALUES (?, ?, ?, ?, ?)
+""", (app_id, name, genres, price, release_date))
+
+cursor.execute("""
+INSERT INTO popularity (app_id, timestamp, player_count)
+VALUES (?, ?, ?)
+""", (app_id, datetime.now().isoformat(), player_count))
+
+conn.commit()
