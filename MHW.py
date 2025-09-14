@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 conn = sqlite3.connect("steam_games.db")
-cursor = conn.cursor
+cursor = conn.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS games (
