@@ -16,9 +16,8 @@ CREATE TABLE IF NOT EXISTS games (
 )
 """)
 
-cursor.execute("DROP TABLE IF EXISTS popularity")
 cursor.execute("""
-CREATE TABLE popularity (
+CREATE TABLE IF NOT EXISTS popularity (
     app_id INTEGER,
     rank_position INTEGER,
     peak_in_game INTEGER,
