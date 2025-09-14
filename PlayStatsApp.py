@@ -32,7 +32,18 @@ top_games = charts_resp["response"]["ranks"][:10]
 
 for game in top_games:
     app_id = game["appid"]
-    player_count = game["concurrent_in_game"]
+    player_count = None
+    if "concurrent_in_game" in game:
+        player_count = game["concurrent_in_game"]
+    elif "current_players" in game:
+        player_count = game["current_players"]
+    elif "concurrent_players" in game:
+        player_count = game["concurrent_players"]
+    else:
+        # fallback or skip
+        print(f"Skipping {app_id} because no known player_count field in {game.keys()}")
+        continue
+
 
     # --- Step 3: Fetch store details for each game ---
     store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
