@@ -25,3 +25,15 @@ CREATE TABLE IF NOT EXISTS popularity (
 )
 """)
 
+# --- Step 2: Fetch data for one game ---
+app_id = 582010  # Monster Hunter: World
+store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
+players_url = f"https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid={app_id}"
+
+# Get game details (price, genre, etc.)
+store_response = requests.get(store_url).json()
+game_data = store_response[str(app_id)]["data"]
+
+name = game_data["name"]
+genres = ", ".join([g["description"] for g in game_data.get("genres", [])])
+release_date = game_data.get("release_date", {}).get("date", "Unknown")
