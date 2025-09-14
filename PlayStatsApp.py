@@ -30,34 +30,40 @@ charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGame
 charts_resp = requests.get(charts_url).json()
 top_games = charts_resp["response"]["ranks"][:10]
 
-# Get game details (price, genre, etc.)
-store_response = requests.get(store_url).json()
-game_data = store_response[str(app_id)]["data"]
+for game in top_games:
+    app_id = game["appid"]
+    player_count = game["concurrent_in_game"]
 
-name = game_data["name"]
-genres = ", ".join([g["description"] for g in game_data.get("genres", [])])
-release_date = game_data.get("release_date", {}).get("date", "Unknown")
+    # --- Step 3: Fetch store details for each game ---
+    store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
+    store_resp = requests.get(store_url).json()
 
-# Price handling
-if "price_overview" in game_data:
-    price = game_data["price_overview"]["final"] / 100  # comes in cents
-else:
-    price = 0.0  # free or unavailable
+    if not store_resp.get(str(app_id), {}).get("success"):
+        print(f"Skipping {app_id}, no store data.")
+        continue
 
-# Get current player count
-players_response = requests.get(players_url).json()
-player_count = players_response.get("response", {}).get("player_count", 0)
+    data = store_resp[str(app_id)]["data"]
+    name = data.get("name", "Unknown")
+    genres = ", ".join([g["description"] for g in data.get("genres", [])])
+    release_date = data.get("release_date", {}).get("date", "Unknown")
 
-# --- Step 3: Insert into SQLite ---
-cursor.execute("""
-INSERT OR REPLACE INTO games (app_id, name, genre, price, release_date)
-VALUES (?, ?, ?, ?, ?)
-""", (app_id, name, genres, price, release_date))
+    if "price_overview" in data:
+        price = data["price_overview"]["final"] / 100
+    else:
+        price = 0.0
 
-cursor.execute("""
-INSERT INTO popularity (app_id, timestamp, player_count)
-VALUES (?, ?, ?)
-""", (app_id, datetime.now().isoformat(), player_count))
+    # --- Step 4: Insert into SQLite ---
+    cursor.execute("""
+    INSERT OR REPLACE INTO games (app_id, name, genre, price, release_date)
+    VALUES (?, ?, ?, ?, ?)
+    """, (app_id, name, genres, price, release_date))
+
+    cursor.execute("""
+    INSERT INTO popularity (app_id, timestamp, player_count)
+    VALUES (?, ?, ?)
+    """, (app_id, datetime.now().isoformat(), player_count))
+
+    print(f"Saved {name} | Players: {player_count} | Price: ${price}")
 
 conn.commit()
 
