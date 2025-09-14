@@ -60,3 +60,24 @@ VALUES (?, ?, ?)
 """, (app_id, datetime.now().isoformat(), player_count))
 
 conn.commit()
+
+# --- Step 4: Simple Visualization ---
+cursor.execute("""
+SELECT g.name, g.price, p.player_count
+FROM games g
+JOIN popularity p ON g.app_id = p.app_id
+WHERE g.app_id = ?
+ORDER BY p.timestamp DESC
+LIMIT 1
+""", (app_id,))
+
+row = cursor.fetchone()
+if row:
+    game_name, game_price, game_popularity = row
+
+    plt.bar(["Price", "Player Count"], [game_price, game_popularity])
+    plt.title(f"{game_name} (Price vs Popularity)")
+    plt.ylabel("Value")
+    plt.show()
+
+conn.close()
