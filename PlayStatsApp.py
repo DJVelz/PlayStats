@@ -32,16 +32,13 @@ top_games = charts_resp["response"]["ranks"][:10]
 
 for game in top_games:
     app_id = game["appid"]
-    player_count = None
-    if "concurrent_in_game" in game:
-        player_count = game["concurrent_in_game"]
-    elif "current_players" in game:
-        player_count = game["current_players"]
-    elif "concurrent_players" in game:
-        player_count = game["concurrent_players"]
-    else:
-        # fallback or skip
-        print(f"Skipping {app_id} because no known player_count field in {game.keys()}")
+    for key in ("concurrent_in_game", "current_players", "concurrent_players", "in_game", "players"):
+        if key in game:
+            player_count = game[key]
+            break
+
+    if player_count is None:
+        print(f"Skipping app {app_id}, missing player count field. Keys present: {list(game.keys())}")
         continue
 
 
