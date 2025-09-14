@@ -16,11 +16,12 @@ CREATE TABLE IF NOT EXISTS games (
 )
 """)
 
+cursor.execute("DROP TABLE IF EXISTS popularity")
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS popularity (
+CREATE TABLE popularity (
     app_id INTEGER,
-    timestamp TEXT,
-    player_count INTEGER,
+    rank_position INTEGER,
+    peak_in_game INTEGER,
     FOREIGN KEY (app_id) REFERENCES games(app_id)
 )
 """)
@@ -32,15 +33,8 @@ top_games = charts_resp["response"]["ranks"][:10]
 
 for game in top_games:
     app_id = game["appid"]
-    for key in ("concurrent_in_game", "current_players", "concurrent_players", "in_game", "players"):
-        if key in game:
-            player_count = game[key]
-            break
-
-    if player_count is None:
-        print(f"Skipping app {app_id}, missing player count field. Keys present: {list(game.keys())}")
-        continue
-
+    rank = game.get("rank")
+    peak = game.get("peak_in_game")
 
     # --- Step 3: Fetch store details for each game ---
     store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
@@ -54,11 +48,7 @@ for game in top_games:
     name = data.get("name", "Unknown")
     genres = ", ".join([g["description"] for g in data.get("genres", [])])
     release_date = data.get("release_date", {}).get("date", "Unknown")
-
-    if "price_overview" in data:
-        price = data["price_overview"]["final"] / 100
-    else:
-        price = 0.0
+    price = data.get("price_overview", {}).get("final", 0) / 100  # in USD
 
     # --- Step 4: Insert into SQLite ---
     cursor.execute("""
@@ -67,21 +57,20 @@ for game in top_games:
     """, (app_id, name, genres, price, release_date))
 
     cursor.execute("""
-    INSERT INTO popularity (app_id, timestamp, player_count)
+    INSERT INTO popularity (app_id, rank_position, peak_in_game)
     VALUES (?, ?, ?)
-    """, (app_id, datetime.now().isoformat(), player_count))
+    """, (app_id, rank, peak))
 
-    print(f"Saved {name} | Players: {player_count} | Price: ${price}")
+
+    print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Price: ${price}")
 
 conn.commit()
 
 # --- Step 5: Simple Visualization ---
 cursor.execute("""
-SELECT g.name, g.price, p.player_count
+SELECT g.name, g.price, p.rank_position, p.peak_in_game
 FROM games g
 JOIN popularity p ON g.app_id = p.app_id
-WHERE p.timestamp = (SELECT MAX(timestamp) FROM popularity)
-LIMIT 10
 """)
 
 rows = cursor.fetchall()
@@ -90,14 +79,11 @@ names = [r[0] for r in rows]
 prices = [r[1] for r in rows]
 players = [r[2] for r in rows]
 
-# Scatter plot: Price vs Player Count
-plt.scatter(prices, players)
-for i, name in enumerate(names):
-    plt.text(prices[i], players[i], name, fontsize=8)
-
-plt.title("Top 10 Most Played Games (Price vs Popularity)")
-plt.xlabel("Price (USD)")
-plt.ylabel("Concurrent Players")
+plt.barh(names, peaks)
+plt.xlabel("Peak Players")
+plt.ylabel("Game")
+plt.title("Top 10 Most Played Steam Games (Peak Players)")
+plt.gca().invert_yaxis()  # highest peak on top
 plt.show()
 
 conn.close()
