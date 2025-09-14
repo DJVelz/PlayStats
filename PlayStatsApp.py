@@ -25,10 +25,10 @@ CREATE TABLE IF NOT EXISTS popularity (
 )
 """)
 
-# --- Step 2: Fetch data for one game ---
-app_id = 582010  # Monster Hunter: World
-store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
-players_url = f"https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid={app_id}"
+# --- Step 2: Fetch Top 10 Most Played Games ---
+charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
+charts_resp = requests.get(charts_url).json()
+top_games = charts_resp["response"]["ranks"][:10]
 
 # Get game details (price, genre, etc.)
 store_response = requests.get(store_url).json()
