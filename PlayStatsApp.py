@@ -78,6 +78,7 @@ rows = cursor.fetchall()
 names = [r[0] for r in rows]
 prices = [r[1] for r in rows]
 players = [r[2] for r in rows]
+peaks = [r[3] for r in rows]
 
 plt.barh(names, peaks)
 plt.xlabel("Peak Players")
