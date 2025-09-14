@@ -67,23 +67,29 @@ for game in top_games:
 
 conn.commit()
 
-# --- Step 4: Simple Visualization ---
+# --- Step 5: Simple Visualization ---
 cursor.execute("""
 SELECT g.name, g.price, p.player_count
 FROM games g
 JOIN popularity p ON g.app_id = p.app_id
-WHERE g.app_id = ?
-ORDER BY p.timestamp DESC
-LIMIT 1
-""", (app_id,))
+WHERE p.timestamp = (SELECT MAX(timestamp) FROM popularity)
+LIMIT 10
+""")
 
-row = cursor.fetchone()
-if row:
-    game_name, game_price, game_popularity = row
+rows = cursor.fetchall()
 
-    plt.bar(["Price", "Player Count"], [game_price, game_popularity])
-    plt.title(f"{game_name} (Price vs Popularity)")
-    plt.ylabel("Value")
-    plt.show()
+names = [r[0] for r in rows]
+prices = [r[1] for r in rows]
+players = [r[2] for r in rows]
+
+# Scatter plot: Price vs Player Count
+plt.scatter(prices, players)
+for i, name in enumerate(names):
+    plt.text(prices[i], players[i], name, fontsize=8)
+
+plt.title("Top 10 Most Played Games (Price vs Popularity)")
+plt.xlabel("Price (USD)")
+plt.ylabel("Concurrent Players")
+plt.show()
 
 conn.close()
