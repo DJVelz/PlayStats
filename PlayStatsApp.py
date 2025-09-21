@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS popularity (
 # --- Step 2: Fetch Top 10 Most Played Games ---
 charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
 charts_resp = requests.get(charts_url).json()
-top_games = charts_resp["response"]["ranks"][:10]
+top_games = charts_resp["response"]["ranks"][:25]
 
 for game in top_games:
     app_id = game["appid"]
@@ -72,6 +72,7 @@ cursor.execute("""
 SELECT g.name, g.price, p.rank_position, p.peak_in_game
 FROM games g
 JOIN popularity p ON g.app_id = p.app_id
+ORDER BY p.peak_in_game DESC
 """)
 
 rows = cursor.fetchall()
