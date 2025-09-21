@@ -85,7 +85,7 @@ peaks = [r[3] for r in rows]
 plt.barh(names, peaks)
 plt.xlabel("Peak Players")
 plt.ylabel("Game")
-plt.title("Top 10 Most Played Steam Games (Peak Players)")
+plt.title("Top 25 Most Played Steam Games (Peak Players)")
 plt.gca().invert_yaxis()  # highest peak on top
 def thousands(x, pos):
     return f'{int(x/1000)}k'
