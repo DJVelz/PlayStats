@@ -62,7 +62,7 @@ for game in top_games:
     cursor.execute("""
     INSERT INTO popularity (app_id, rank_position, peak_in_game, snapshot_time)
     VALUES (?, ?, ?, ?)
-    """, (app_id, rank, int(peak)))
+    """, (app_id, rank, int(peak), snapshot_time))
 
 
     print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Price: ${price}")
