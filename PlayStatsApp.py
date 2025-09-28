@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS popularity (
     app_id INTEGER,
     rank_position INTEGER,
     peak_in_game INTEGER,
+    snapshot_time TEXT,
     FOREIGN KEY (app_id) REFERENCES games(app_id)
 )
 """)
