@@ -73,6 +73,7 @@ cursor.execute("""
 SELECT g.name, g.price, p.rank_position, p.peak_in_game
 FROM games g
 JOIN popularity p ON g.app_id = p.app_id
+WHERE p.snapshot_time = (SELECT MAX(snapshot_time) FROM popularity)
 ORDER BY p.peak_in_game DESC
 """)
 
