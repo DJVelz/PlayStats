@@ -35,12 +35,12 @@ charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGame
 charts_resp = requests.get(charts_url).json()
 top_games = charts_resp["response"]["ranks"][:25]
 
+snapshot_time = datetime.utcnow().isoformat()
+
 for game in top_games:
     app_id = game["appid"]
     rank = game.get("rank")
     peak = game.get("peak_in_game")
-
-    snapshot_time = datetime.utcnow().isoformat()
 
     # --- Step 3: Fetch store details for each game ---
     store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
