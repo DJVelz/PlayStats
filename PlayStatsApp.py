@@ -61,7 +61,7 @@ for game in top_games:
 
     cursor.execute("""
     INSERT INTO popularity (app_id, rank_position, peak_in_game, snapshot_time)
-    VALUES (?, ?, ?)
+    VALUES (?, ?, ?, ?)
     """, (app_id, rank, int(peak)))
 
 
