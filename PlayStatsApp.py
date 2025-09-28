@@ -39,6 +39,8 @@ for game in top_games:
     rank = game.get("rank")
     peak = game.get("peak_in_game")
 
+    snapshot_time = datetime.estnow().isoformat()
+
     # --- Step 3: Fetch store details for each game ---
     store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
     store_resp = requests.get(store_url).json()
