@@ -61,6 +61,7 @@ else:
 all_data = pd.read_csv(csv_file)
 latest_time = all_data["snapshot_time"].max()
 latest_snapshot = all_data[all_data["snapshot_time"] == latest_time]
+latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False)
 
 plt.barh(latest_snapshot["name"], latest_snapshot["peak_in_game"])
 plt.xlabel("Peak Players")
