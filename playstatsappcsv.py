@@ -33,3 +33,14 @@ for game in top_games:
     genres = ", ".join([g["description"] for g in data.get("genres", [])])
     release_date = data.get("release_date", {}).get("date", "Unknown")
     price = data.get("price_overview", {}).get("final", 0) / 100  # USD
+
+    rows.append({
+        "app_id": app_id,
+        "name": name,
+        "genre": genres,
+        "price": price,
+        "release_date": release_date,
+        "rank_position": rank,
+        "peak_in_game": peak,
+        "snapshot_time": snapshot_time
+    })
