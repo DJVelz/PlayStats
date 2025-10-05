@@ -46,3 +46,31 @@ for game in top_games:
     })
 
     print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Time: {snapshot_time}")
+
+# Save to CSV ---
+df = pd.DataFrame(rows)
+
+csv_file = "steam_data.csv"
+# Append to existing CSV or create new one
+if os.path.exists(csv_file):
+    df.to_csv(csv_file, mode="a", header=False, index=False)
+else:
+    df.to_csv(csv_file, index=False)
+
+# Visualization (latest snapshot only) ---
+all_data = pd.read_csv(csv_file)
+latest_time = all_data["snapshot_time"].max()
+latest_snapshot = all_data[all_data["snapshot_time"] == latest_time]
+
+plt.barh(latest_snapshot["name"], latest_snapshot["peak_in_game"])
+plt.xlabel("Peak Players")
+plt.ylabel("Game")
+plt.title(f"Top 25 Most Played Steam Games ({latest_time})")
+plt.gca().invert_yaxis()
+
+def thousands(x, pos):
+    return f'{int(x/1000)}k'
+
+plt.gca().xaxis.set_major_formatter(FuncFormatter(thousands))
+plt.tight_layout()
+plt.show()
