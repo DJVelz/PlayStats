@@ -44,3 +44,5 @@ for game in top_games:
         "peak_in_game": peak,
         "snapshot_time": snapshot_time
     })
+
+    print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Time: {snapshot_time}")
