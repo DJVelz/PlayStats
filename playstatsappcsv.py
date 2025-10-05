@@ -23,3 +23,8 @@ for game in top_games:
 
     store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
     store_resp = requests.get(store_url).json()
+
+    if not store_resp.get(str(app_id), {}).get("success"):
+        print(f"Skipping {app_id}, no store data.")
+        continue
+
