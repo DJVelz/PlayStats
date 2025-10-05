@@ -6,3 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from zoneinfo import ZoneInfo
 
+# Fetch Top 25 Most Played Games on Steam
+charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
+charts_resp = requests.get(charts_url).json()
+top_games = charts_resp["response"]["ranks"][:25]
