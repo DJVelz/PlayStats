@@ -28,3 +28,8 @@ for game in top_games:
         print(f"Skipping {app_id}, no store data.")
         continue
 
+    data = store_resp[str(app_id)]["data"]
+    name = data.get("name", "Unknown")
+    genres = ", ".join([g["description"] for g in data.get("genres", [])])
+    release_date = data.get("release_date", {}).get("date", "Unknown")
+    price = data.get("price_overview", {}).get("final", 0) / 100  # USD
