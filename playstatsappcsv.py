@@ -51,6 +51,7 @@ for game in top_games:
 df = pd.DataFrame(rows)
 
 csv_file = "steam_data.csv"
+
 # Append to existing CSV or create new one
 if os.path.exists(csv_file):
     df.to_csv(csv_file, mode="a", header=False, index=False)
