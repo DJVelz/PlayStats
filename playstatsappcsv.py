@@ -26,38 +26,45 @@ def fetch_top_games(top_n=25):
 # Prep snapshot timestamp
 snapshot_time = datetime.utcnow().isoformat()
 
-# Collect game data
-rows = []
-for game in top_games:
-    app_id = game["appid"]
-    rank = game.get("rank")
-    peak = game.get("peak_in_game")
+# --- Step 2: Collect Game Details ---
+def collect_game_data(top_games, snapshot_time):
+    """Fetch detailed store information for each game."""
+    rows = []
+    for game in top_games:
+        app_id = game["appid"]
+        rank = game.get("rank")
+        peak = game.get("peak_in_game")
 
-    store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
-    store_resp = requests.get(store_url).json()
+        store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
+        try:
+            store_resp = requests.get(store_url, timeout=10).json()
+        except Exception as e:
+            print(f"Error fetching store data for {app_id}: {e}")
+            continue
 
-    if not store_resp.get(str(app_id), {}).get("success"):
-        print(f"Skipping {app_id}, no store data.")
-        continue
+        if not store_resp.get(str(app_id), {}).get("success"):
+            print(f"Skipping {app_id}, no store data.")
+            continue
 
-    data = store_resp[str(app_id)]["data"]
-    name = data.get("name", "Unknown")
-    genres = ", ".join([g["description"] for g in data.get("genres", [])])
-    release_date = data.get("release_date", {}).get("date", "Unknown")
-    price = data.get("price_overview", {}).get("final", 0) / 100  # USD
+        data = store_resp[str(app_id)]["data"]
+        name = data.get("name", "Unknown")
+        genres = ", ".join([g["description"] for g in data.get("genres", [])])
+        release_date = data.get("release_date", {}).get("date", "Unknown")
+        price = data.get("price_overview", {}).get("final", 0) / 100  # USD
 
-    rows.append({
-        "app_id": app_id,
-        "name": name,
-        "genre": genres,
-        "price": price,
-        "release_date": release_date,
-        "rank_position": rank,
-        "peak_in_game": peak,
-        "snapshot_time": snapshot_time
-    })
+        rows.append({
+            "app_id": app_id,
+            "name": name,
+            "genre": genres,
+            "price": price,
+            "release_date": release_date,
+            "rank_position": rank,
+            "peak_in_game": peak,
+            "snapshot_time": snapshot_time
+        })
 
-    print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Time: {snapshot_time}")
+        print(f"Saved {name} | Rank: {rank} | Peak players: {peak} | Time: {snapshot_time}")
+    return pd.DataFrame(rows)
 
 # Save to CSV ---
 df = pd.DataFrame(rows)
