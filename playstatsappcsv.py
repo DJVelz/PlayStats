@@ -1,3 +1,8 @@
+"""
+PlayStats App — Fetches top Steam games and records timestamped snapshots to CSV.
+Author: Dereck Velez Matias
+"""
+
 import requests
 import pandas as pd
 import os
