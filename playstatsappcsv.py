@@ -11,10 +11,17 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from zoneinfo import ZoneInfo
 
-# Fetch Top 25 Most Played Games on Steam
-charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
-charts_resp = requests.get(charts_url).json()
-top_games = charts_resp["response"]["ranks"][:25]
+# --- Step 1: Fetch Top N Most Played Games ---
+def fetch_top_games(top_n=25):
+    """Fetch the Top N most played Steam games."""
+    charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
+    try:
+        charts_resp = requests.get(charts_url, timeout=10).json()
+        top_games = charts_resp["response"]["ranks"][:top_n]
+        return top_games
+    except Exception as e:
+        print("Error fetching Steam charts data:", e)
+        return []
 
 # Prep snapshot timestamp
 snapshot_time = datetime.utcnow().isoformat()
