@@ -119,3 +119,25 @@ def visualize_latest_snapshot(csv_file):
     print(f"Saved visualization as {plot_file}")
 
     plt.show()
+
+    # --- Main Execution ---
+    if __name__ == "__main__":
+        print("=== PlayStats: Steam Game Popularity Tracker ===")
+
+    # Ask user for number of top games to fetch
+    try:
+        TOP_N = int(input("Enter how many top games to fetch (default 25): ") or 25)
+    except ValueError:
+        TOP_N = 25
+
+    # Timestamp in UTC (standard for consistency)
+    snapshot_time = datetime.utcnow().isoformat()
+
+    # Fetch, collect, save, and visualize
+    top_games = fetch_top_games(TOP_N)
+    if top_games:
+        df = collect_game_data(top_games, snapshot_time)
+        save_snapshot(df)
+        visualize_latest_snapshot("steam_data.csv")
+    else:
+        print("No data collected.")
