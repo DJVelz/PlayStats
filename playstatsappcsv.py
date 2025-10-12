@@ -151,12 +151,13 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False)
 
     # Plot
-    plt.figure(figsize=(11, 9))
-    plt.barh(latest_snapshot["name"], latest_snapshot["peak_in_game"])
-    plt.xlabel("Peak Players")
-    plt.ylabel("Game")
+    plt.bar(latest_snapshot["name"], latest_snapshot["peak_in_game"])
+    plt.ylabel("Peak Players")
+    plt.xlabel("Game")
     plt.title(f"Top {len(latest_snapshot)} Most Played Steam Games — {latest_time[:19].replace('T', ' ')} UTC")
-    plt.gca().invert_yaxis()
+
+    # Rotate x-axis labels so they don't overlap
+    plt.xticks(rotation=75, ha='right')
 
     def thousands(x, pos):
         try:
