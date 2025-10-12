@@ -151,6 +151,7 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False)
 
     # Plot
+    plt.figure(figsize=(16, 8))
     plt.bar(latest_snapshot["name"], latest_snapshot["peak_in_game"])
     plt.ylabel("Peak Players")
     plt.xlabel("Game")
