@@ -6,7 +6,7 @@ Author: Dereck Velez Matias
 import requests
 import pandas as pd
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 from zoneinfo import ZoneInfo
@@ -22,9 +22,6 @@ def fetch_top_games(top_n=25):
     except Exception as e:
         print("Error fetching Steam charts data:", e)
         return []
-
-# Prep snapshot timestamp
-snapshot_time = datetime.utcnow().isoformat()
 
 # --- Step 2: Collect Game Details ---
 def collect_game_data(top_games, snapshot_time):
@@ -124,14 +121,11 @@ def visualize_latest_snapshot(csv_file):
     if __name__ == "__main__":
         print("=== PlayStats: Steam Game Popularity Tracker ===")
 
-    # Ask user for number of top games to fetch
-    try:
-        TOP_N = int(input("Enter how many top games to fetch (default 25): ") or 25)
-    except ValueError:
-        TOP_N = 25
+    # Static number of games to fetch
+    TOP_N = 100
 
     # Timestamp in UTC (standard for consistency)
-    snapshot_time = datetime.utcnow().isoformat()
+    snapshot_time = datetime.now(timezone.utc).isoformat()
 
     # Fetch, collect, save, and visualize
     top_games = fetch_top_games(TOP_N)
