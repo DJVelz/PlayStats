@@ -67,7 +67,7 @@ latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False
 plt.barh(latest_snapshot["name"], latest_snapshot["peak_in_game"])
 plt.xlabel("Peak Players")
 plt.ylabel("Game")
-plt.title(f"Top 25 Most Played Steam Games ({latest_time})")
+plt.title(f"Top 25 Most Played Steam Games — {latest_time[:19].replace('T', ' ')} UTC")
 plt.gca().invert_yaxis()
 
 def thousands(x, pos):
