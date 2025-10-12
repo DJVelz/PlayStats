@@ -161,12 +161,9 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.xticks(rotation=75, ha='right')
 
     def thousands(x, pos):
-        try:
-            return f'{int(x/1000)}k'
-        except Exception:
-            return x
+        return f'{int(x/1000)}k'
 
-    plt.gca().xaxis.set_major_formatter(FuncFormatter(thousands))
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(thousands))
     plt.tight_layout()
 
     plot_file = f"plot_{latest_time.replace(':', '-')}.png"
