@@ -62,7 +62,7 @@ def collect_game_data(top_games, snapshot_time):
                 logging.warning("Skipping entry %d: missing appid: %s", idx, game)
                 continue
 
-            store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}"
+            store_url = f"https://store.steampowered.com/api/appdetails?appids={app_id}&l=english"
             resp = requests.get(store_url, timeout=REQUEST_TIMEOUT)
             # if status not 200 we still try to inspect json, but raise if HTTP error
             resp.raise_for_status()
