@@ -154,7 +154,7 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.title(f"Top {len(latest_snapshot)} Most Played Steam Games — {latest_time[:19].replace('T', ' ')} UTC")
 
     # Rotate x-axis labels so they don't overlap
-    plt.xticks(rotation=75, ha='right')
+    plt.xticks(rotation=45, ha='right')
 
     def thousands(x, pos):
         return f'{int(x/1000)}k'
