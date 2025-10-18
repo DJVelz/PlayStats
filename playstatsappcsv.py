@@ -19,7 +19,6 @@ from matplotlib.ticker import FuncFormatter
 # ---------- Configuration ----------
 TOP_N = 100
 CSV_FILE = "steam_data.csv"
-STORE_REQUEST_DELAY_SEC = 0.05  # small delay between store calls to be polite / avoid throttling
 REQUEST_TIMEOUT = 10  # seconds
 
 # ---------- Logging ----------
@@ -72,7 +71,7 @@ def collect_game_data(top_games, snapshot_time):
             entry = store_resp.get(str(app_id))
             if not entry or not entry.get("success"):
                 logging.warning("No store data for app_id %s (skipping).", app_id)
-                time.sleep(STORE_REQUEST_DELAY_SEC)
+                time.sleep(.005)
                 continue
 
             data = entry["data"]
@@ -93,9 +92,6 @@ def collect_game_data(top_games, snapshot_time):
             })
 
             logging.info("[%d/%d] Collected: %s | rank=%s | peak=%s", idx, len(top_games), name, rank, peak)
-
-            # small delay so we don't hammer the store endpoint
-            time.sleep(STORE_REQUEST_DELAY_SEC)
 
         except Exception:
             logging.exception("Error processing game at index %d (app_id=%s)", idx, game.get("appid") if isinstance(game, dict) else None)
