@@ -145,7 +145,7 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
         return False
 
     latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False)
-
+    
     # Plot
     plt.figure(figsize=(16, 8))
     plt.bar(latest_snapshot["name"], latest_snapshot["peak_in_game"])
@@ -167,8 +167,21 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     logging.info("Saved visualization: %s", plot_file)
 
     plt.show()
-    return True
 
+    # Visualize top genres
+    genre_counts = latest_snapshot["genre"].str.split(",").explode().value_counts()
+
+    plt.figure(figsize=(10, 6))
+    genre_counts.plot(kind="bar", color="skyblue")
+    plt.title("Genre Frequency in Top Steam Games")
+    plt.xlabel("Genre")
+    plt.ylabel("Number of Games")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    plt.show()
+
+    return True
+    
 # ---------- Main ----------
 def main():
     logging.info("=== PlayStats: Starting run (Top %d) ===", TOP_N)
