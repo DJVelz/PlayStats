@@ -162,10 +162,6 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.gca().yaxis.set_major_formatter(FuncFormatter(thousands))
     plt.tight_layout()
 
-    plot_file = f"plot_{latest_time.replace(':', '-')}.png"
-    plt.savefig(plot_file)
-    logging.info("Saved visualization: %s", plot_file)
-
     plt.show()
 
     # Visualize top genres
