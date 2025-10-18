@@ -19,7 +19,7 @@ from matplotlib.ticker import FuncFormatter
 # ---------- Configuration ----------
 TOP_N = 100
 CSV_FILE = "steam_data.csv"
-STORE_REQUEST_DELAY_SEC = 0.25  # small delay between store calls to be polite / avoid throttling
+STORE_REQUEST_DELAY_SEC = 0.05  # small delay between store calls to be polite / avoid throttling
 REQUEST_TIMEOUT = 10  # seconds
 
 # ---------- Logging ----------
