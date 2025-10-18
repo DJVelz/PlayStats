@@ -29,7 +29,6 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-
 # ---------- Step 1: Fetch Top N Most Played Games ----------
 def fetch_top_games(top_n=TOP_N):
     charts_url = "https://api.steampowered.com/ISteamChartsService/GetMostPlayedGames/v1/"
@@ -48,7 +47,6 @@ def fetch_top_games(top_n=TOP_N):
     except Exception as e:
         logging.exception("Error fetching Steam charts data")
         return []
-
 
 # ---------- Step 2: Collect Game Details ----------
 def collect_game_data(top_games, snapshot_time):
@@ -108,7 +106,6 @@ def collect_game_data(top_games, snapshot_time):
         logging.warning("No rows were collected from store details.")
     return df
 
-
 # ---------- Step 3: Save to CSV (with snapshot system) ----------
 def save_snapshot(df, csv_file=CSV_FILE):
     if df is None or df.empty:
@@ -129,7 +126,6 @@ def save_snapshot(df, csv_file=CSV_FILE):
 
     logging.info("Snapshot saved to %s with %d entries.", csv_file, len(df))
     return True
-
 
 # ---------- Step 4: Visualization ----------
 def visualize_latest_snapshot(csv_file=CSV_FILE):
@@ -173,7 +169,6 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.show()
     return True
 
-
 # ---------- Main ----------
 def main():
     logging.info("=== PlayStats: Starting run (Top %d) ===", TOP_N)
@@ -193,7 +188,6 @@ def main():
         visualize_latest_snapshot(CSV_FILE)
     else:
         logging.error("Snapshot was not saved; skipping visualization.")
-
 
 if __name__ == "__main__":
     main()
