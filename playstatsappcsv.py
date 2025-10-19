@@ -15,6 +15,7 @@ import logging
 from datetime import datetime, timezone
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
+from collections import Counter
 
 # ---------- Configuration ----------
 TOP_N = 100
@@ -76,7 +77,14 @@ def collect_game_data(top_games, snapshot_time):
 
             data = entry["data"]
             name = data.get("name", "Unknown")
-            genres = ", ".join([g.get("description", "") for g in data.get("genres", [])]) if data.get("genres") else ""
+            # Collect and normalize only English genres
+            genres = [
+                g["description"].strip().lower()
+                for game in data
+                if "genres" in game
+                for g in game["genres"]
+                if g.get("language") == "english"
+            ]
             release_date = data.get("release_date", {}).get("date", "Unknown")
             price = data.get("price_overview", {}).get("final", 0) / 100 if data.get("price_overview") else 0.0
 
@@ -160,15 +168,18 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
 
     plt.show()
 
-    # Visualize top genres
-    genre_counts = latest_snapshot["genre"].str.split(",").explode().value_counts()
+    # Count and format genres
+    genre_counts = Counter(genres)
+    genre_labels = [g.capitalize() for g in genre_counts]
+    genre_values = list(genre_counts.values())
 
-    plt.figure(figsize=(10, 6))
-    genre_counts.plot(kind="bar", color="skyblue")
-    plt.title("Genre Frequency in Top Steam Games")
+    # Plot chart
+    plt.figure(figsize=(10, 5))
+    plt.bar(genre_labels, genre_values)
+    plt.title("Genre Frequency in Top Games (English Only)")
     plt.xlabel("Genre")
-    plt.ylabel("Number of Games")
-    plt.xticks(rotation=60, ha="right")
+    plt.ylabel("Count in Top Games")
+    plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
     plt.show()
 
