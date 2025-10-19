@@ -77,14 +77,7 @@ def collect_game_data(top_games, snapshot_time):
 
             data = entry["data"]
             name = data.get("name", "Unknown")
-            # Collect and normalize only English genres
-            genres = [
-                g["description"].strip().lower()
-                for game in data
-                if "genres" in game
-                for g in game["genres"]
-                if g.get("language") == "english"
-            ]
+            genres = ", ".join([g.get("description", "") for g in data.get("genres", [])]) if data.get("genres") else ""
             release_date = data.get("release_date", {}).get("date", "Unknown")
             price = data.get("price_overview", {}).get("final", 0) / 100 if data.get("price_overview") else 0.0
 
@@ -148,32 +141,35 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
         logging.error("No rows found for latest snapshot_time = %s", latest_time)
         return False
 
+    # ---------- Top 100 Games by Player Count ----------
     latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False)
-    
-    # Plot
     plt.figure(figsize=(16, 8))
     plt.bar(latest_snapshot["name"], latest_snapshot["peak_in_game"])
     plt.ylabel("Peak Players")
     plt.xlabel("Game")
     plt.title(f"Top {len(latest_snapshot)} Most Played Steam Games — {latest_time[:19].replace('T', ' ')} UTC")
 
-    # Rotate x-axis labels so they don't overlap
     plt.xticks(rotation=60, ha='right')
-
-    def thousands(x, pos):
-        return f'{int(x/1000)}k'
-
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(thousands))
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f'{int(x/1000)}k'))
     plt.tight_layout()
-
     plt.show()
 
-    # Count and format genres
-    genre_counts = Counter(genres)
+    # ---------- Genre Frequency Chart ----------
+    all_genres = (
+        latest_snapshot["genre"]
+        .dropna()
+        .str.lower()
+        .str.split(",")
+        .explode()
+        .str.strip()
+        .replace("", None)
+        .dropna()
+    )
+
+    genre_counts = Counter(all_genres)
     genre_labels = [g.capitalize() for g in genre_counts]
     genre_values = list(genre_counts.values())
 
-    # Plot chart
     plt.figure(figsize=(10, 5))
     plt.bar(genre_labels, genre_values)
     plt.title("Genre Frequency in Top Games (English Only)")
@@ -183,9 +179,9 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.tight_layout()
     plt.show()
 
-    # Price Distribution Analysis
+    # ---------- Price Range Distribution ----------
     bins = [-0.01, 0.01, 9.99, 29.99, 59.99, 1000]
-    labels = ["Free", "<$10", "<$30", "<$60", "60+"]
+    labels = ["Free", "<$10", "<$30", "<$60", "$60+"]
     price_categories = pd.cut(latest_snapshot["price"], bins=bins, labels=labels)
     price_counts = price_categories.value_counts().sort_index()
 
