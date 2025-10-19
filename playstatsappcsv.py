@@ -176,6 +176,8 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
 
     bins = [-0.01, 0.01, 9.99, 29.99, 59.99, 1000]
     labels = ["Free", "<$10", "<$30", "<$60", "60+"]
+    price_categories = pd.cut(latest_snapshot["price"], bins=bins, labels=labels)
+    price_counts = price_categories.value_counts().sort_index()
 
     return True
     
