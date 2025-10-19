@@ -184,8 +184,8 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.show()
 
     # ---------- Price Range Distribution ----------
-    bins = [-0.01, 0.01, 9.99, 29.99, 59.99, 1000]
-    labels = ["Free", "<$10", "<$30", "<$60", "$60+"]
+    bins = [-0.01, 0.01, 9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99, 79.99, 1000]
+    labels = ["Free", "<$10", "<$20", "<$30", "<$40", "<$50", "<$60", "<$70", "<$80", "80+"]
     price_categories = pd.cut(latest_snapshot["price"], bins=bins, labels=labels)
     price_counts = price_categories.value_counts().sort_index()
 
