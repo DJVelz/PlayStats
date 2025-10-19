@@ -144,7 +144,7 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     # ---------- Top 100 Games by Player Count ----------
     latest_snapshot = latest_snapshot.sort_values(by="peak_in_game", ascending=False)
     plt.figure(figsize=(16, 8))
-    plt.bar(latest_snapshot["name"], latest_snapshot["peak_in_game"])
+    plt.bar(latest_snapshot["name"], latest_snapshot["peak_in_game"], color="deepskyblue")
     plt.ylabel("Peak Players")
     plt.xlabel("Game")
     plt.title(f"Top {len(latest_snapshot)} Most Played Steam Games — {latest_time[:19].replace('T', ' ')} UTC")
