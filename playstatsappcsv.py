@@ -175,7 +175,7 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
 
     # Plot chart
     plt.figure(figsize=(10, 5))
-    plt.bar(genre_labels, genre_values, color="cornflowerblue")
+    plt.bar(genre_labels, genre_values, color="orange")
     plt.title("Genre Frequency in Top Games (English Only)")
     plt.xlabel("Genre")
     plt.ylabel("Count in Top Games")
