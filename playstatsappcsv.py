@@ -175,7 +175,7 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     # Price Distribution Analysis
 
     bins = [-0.01, 0.01, 9.99, 29.99, 59.99, 1000]
-    
+    labels = ["Free", "<$10", "<$30", "<$60", "60+"]
 
     return True
     
