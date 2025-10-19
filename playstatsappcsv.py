@@ -166,12 +166,16 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
         .dropna()
     )
 
+    # Count and sort genres by frequency (descending)
     genre_counts = Counter(all_genres)
-    genre_labels = [g.capitalize() for g in genre_counts]
-    genre_values = list(genre_counts.values())
+    sorted_genres = genre_counts.most_common()  # Returns list of (genre, count)
 
+    genre_labels = [g.capitalize() for g, _ in sorted_genres]
+    genre_values = [count for _, count in sorted_genres]
+
+    # Plot chart
     plt.figure(figsize=(10, 5))
-    plt.bar(genre_labels, genre_values)
+    plt.bar(genre_labels, genre_values, color="cornflowerblue")
     plt.title("Genre Frequency in Top Games (English Only)")
     plt.xlabel("Genre")
     plt.ylabel("Count in Top Games")
