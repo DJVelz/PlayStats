@@ -181,6 +181,11 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.figure(figsize=(8, 5))
     price_counts.plot(kind="bar", color="lightgreen")
     plt.title("Price Range Distribution in Top Steam Games")
+    plt.xlabel("Price Range")
+    plt.ylabel("Number of Games")
+    plt.xticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
 
     return True
     
