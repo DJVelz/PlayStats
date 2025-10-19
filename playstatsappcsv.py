@@ -173,11 +173,14 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.show()
 
     # Price Distribution Analysis
-
     bins = [-0.01, 0.01, 9.99, 29.99, 59.99, 1000]
     labels = ["Free", "<$10", "<$30", "<$60", "60+"]
     price_categories = pd.cut(latest_snapshot["price"], bins=bins, labels=labels)
     price_counts = price_categories.value_counts().sort_index()
+
+    plt.figure(figsize=(8, 5))
+    price_counts.plot(kind="bar", color="lightgreen")
+    plt.title("Price Range Distribution in Top Steam Games")
 
     return True
     
