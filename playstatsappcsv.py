@@ -172,6 +172,11 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.tight_layout()
     plt.show()
 
+    # Price Distribution Analysis
+
+    bins = [-0.01, 0.01, 9.99, 29.99, 59.99, 1000]
+    
+
     return True
     
 # ---------- Main ----------
