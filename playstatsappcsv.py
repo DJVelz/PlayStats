@@ -199,6 +199,112 @@ def visualize_latest_snapshot(csv_file=CSV_FILE):
     plt.show()
 
     return True
+
+# ---------- Step 5: Combined Dashboard + Summary ----------
+def visualize_dashboard(csv_file=CSV_FILE, save_path="dashboard.png"):
+    if not os.path.exists(csv_file):
+        logging.error("CSV file '%s' not found. Run data collection first.", csv_file)
+        return False
+
+    all_data = pd.read_csv(csv_file)
+    if all_data.empty:
+        logging.error("CSV file '%s' is empty.", csv_file)
+        return False
+
+    latest_time = all_data["snapshot_time"].max()
+    latest_snapshot = all_data[all_data["snapshot_time"] == latest_time]
+    if latest_snapshot.empty:
+        logging.error("No rows found for latest snapshot_time = %s", latest_time)
+        return False
+
+    # ----- Summary Metrics -----
+    most_common_genre = (
+        latest_snapshot["genre"]
+        .dropna()
+        .str.lower()
+        .str.split(",")
+        .explode()
+        .str.strip()
+        .replace("", None)
+        .dropna()
+        .mode()
+    )
+    most_common_genre = most_common_genre.iloc[0].capitalize() if not most_common_genre.empty else "Unknown"
+    avg_price = latest_snapshot["price"].mean()
+    most_expensive = latest_snapshot.loc[latest_snapshot["price"].idxmax(), "name"]
+    most_played = latest_snapshot.loc[latest_snapshot["peak_in_game"].idxmax(), "name"]
+
+    print("\n=== PlayStats Summary ===")
+    print(f"Most Played Game: {most_played}")
+    print(f"Most Common Genre: {most_common_genre}")
+    print(f"Average Price: ${avg_price:.2f}")
+    print(f"Most Expensive Game: {most_expensive}")
+    print("==========================\n")
+
+    # ----- Figure Layout -----
+    fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+    fig.suptitle(
+        f"PlayStats Dashboard — Steam Top {len(latest_snapshot)} Games ({latest_time[:19].replace('T', ' ')} UTC)",
+        fontsize=14,
+        fontweight="bold",
+    )
+
+    # 1️⃣ Top Games by Peak Players
+    top_games = latest_snapshot.sort_values(by="peak_in_game", ascending=False).head(15)
+    axes[0, 0].bar(top_games["name"], top_games["peak_in_game"], color="deepskyblue")
+    axes[0, 0].set_title("Top 15 Most Played Games")
+    axes[0, 0].set_ylabel("Peak Players")
+    axes[0, 0].tick_params(axis="x", rotation=60)
+    axes[0, 0].yaxis.set_major_formatter(FuncFormatter(lambda x, pos: f"{int(x/1000)}k"))
+
+    # 2️⃣ Genre Distribution
+    all_genres = (
+        latest_snapshot["genre"]
+        .dropna()
+        .str.lower()
+        .str.split(",")
+        .explode()
+        .str.strip()
+        .replace("", None)
+        .dropna()
+    )
+    genre_counts = Counter(all_genres)
+    top_genres = dict(genre_counts.most_common(10))
+    axes[0, 1].bar(top_genres.keys(), top_genres.values(), color="orange")
+    axes[0, 1].set_title("Top 10 Genres")
+    axes[0, 1].set_xlabel("Genre")
+    axes[0, 1].set_ylabel("Count")
+    axes[0, 1].tick_params(axis="x", rotation=45)
+
+    # 3️⃣ Price Range Distribution
+    bins = [-0.01, 0.01, 9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99, 79.99, 1000]
+    labels = ["Free", "<$10", "<$20", "<$30", "<$40", "<$50", "<$60", "<$70", "<$80", "80+"]
+    price_categories = pd.cut(latest_snapshot["price"], bins=bins, labels=labels)
+    price_counts = price_categories.value_counts().sort_index()
+    axes[1, 0].bar(price_counts.index, price_counts.values, color="limegreen")
+    axes[1, 0].set_title("Price Range Distribution")
+    axes[1, 0].set_xlabel("Price Range")
+    axes[1, 0].set_ylabel("Number of Games")
+
+    # 4️⃣ Summary Text Box
+    summary_text = (
+        f"Most Played: {most_played}\n"
+        f"Most Common Genre: {most_common_genre}\n"
+        f"Average Price: ${avg_price:.2f}\n"
+        f"Most Expensive: {most_expensive}"
+    )
+    axes[1, 1].axis("off")
+    axes[1, 1].text(0.05, 0.7, "PlayStats Summary", fontsize=14, fontweight="bold")
+    axes[1, 1].text(0.05, 0.55, summary_text, fontsize=12, va="top")
+
+    # Adjust layout and save
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig(save_path, dpi=200)
+    logging.info("Dashboard saved to %s", save_path)
+    plt.show()
+
+    return True
+
     
 # ---------- Main ----------
 def main():
@@ -216,7 +322,7 @@ def main():
     df = collect_game_data(top_games, snapshot_time)
     saved = save_snapshot(df, CSV_FILE)
     if saved:
-        visualize_latest_snapshot(CSV_FILE)
+        visualize_dashboard(CSV_FILE)
     else:
         logging.error("Snapshot was not saved; skipping visualization.")
 
