@@ -18,7 +18,7 @@ from matplotlib.ticker import FuncFormatter
 from collections import Counter
 
 # ---------- Configuration ----------
-TOP_N = 100
+TOP_N = 104
 CSV_FILE = "steam_data.csv"
 REQUEST_TIMEOUT = 10  # seconds
 
