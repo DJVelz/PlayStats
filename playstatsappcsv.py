@@ -262,14 +262,12 @@ def visualize_dashboard(csv_file=CSV_FILE, save_path="dashboard.png"):
         .mode()
     )
     most_common_genre = most_common_genre.iloc[0].capitalize() if not most_common_genre.empty else "Unknown"
-    avg_price = latest_snapshot["price"].mean()
     most_expensive = latest_snapshot.loc[latest_snapshot["price"].idxmax(), "name"]
     most_played = latest_snapshot.loc[latest_snapshot["peak_in_game"].idxmax(), "name"]
 
     print("\n=== PlayStats Summary ===")
     print(f"Most Played Game: {most_played}")
     print(f"Most Common Genre: {most_common_genre}")
-    print(f"Average Price: ${avg_price:.2f}")
     print(f"Most Expensive Game: {most_expensive}")
     print("==========================\n")
 
@@ -322,7 +320,6 @@ def visualize_dashboard(csv_file=CSV_FILE, save_path="dashboard.png"):
     summary_text = (
         f"Most Played: {most_played}\n"
         f"Most Common Genre: {most_common_genre}\n"
-        f"Average Price: ${avg_price:.2f}\n"
         f"Most Expensive: {most_expensive}"
     )
     axes[1, 1].axis("off")
