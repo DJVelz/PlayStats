@@ -76,6 +76,11 @@ def collect_game_data(top_games, snapshot_time):
                 continue
 
             data = entry["data"]
+
+            if data.get("type") != "game":
+                logging.info("Skipping non-game entry: %s (type=%s)", data.get("name", "Unknown"), data.get("type"))
+                continue
+            
             name = data.get("name", "Unknown")
             genres = ", ".join([g.get("description", "") for g in data.get("genres", [])]) if data.get("genres") else ""
             release_date = data.get("release_date", {}).get("date", "Unknown")
