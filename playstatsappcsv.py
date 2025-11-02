@@ -80,7 +80,34 @@ def collect_game_data(top_games, snapshot_time):
             if data.get("type") != "game":
                 logging.info("Skipping non-game entry: %s (type=%s)", data.get("name", "Unknown"), data.get("type"))
                 continue
-            
+
+            # ✅ Skip anything that isn't a full "game"
+            if data.get("type") != "game":
+                logging.info("Skipping non-game entry: %s (type=%s)", data.get("name", "Unknown"), data.get("type"))
+                continue
+
+            # ✅ Skip known non-game or utility titles
+            banned_titles = {
+                "Wallpaper Engine",
+                "Soundpad",
+                "SteamVR",
+                "Steamworks Common Redistributables",
+                "VRChat SDK",
+                "Tabletop Simulator (Editor)",
+                "Source Filmmaker",
+                "RPG Maker MZ",
+                "RPG Maker MV",
+                "RPG Maker XP",
+                "RPG Maker 2003",
+                "3DMark",
+                "FaceRig",
+                "VoiceMod",
+                "Wallpaper Engine - Editor"
+            }
+
+            if data.get("name", "").strip() in banned_titles:
+                logging.info("Skipping banned title: %s", data.get("name"))
+                continue
             name = data.get("name", "Unknown")
             genres = ", ".join([g.get("description", "") for g in data.get("genres", [])]) if data.get("genres") else ""
             release_date = data.get("release_date", {}).get("date", "Unknown")
