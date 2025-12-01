@@ -300,7 +300,7 @@ def visualize_dashboard():
     top15 = snap.head(15)
     axes[0, 0].bar(top15["name"], top15["peak_in_game"], color="deepskyblue")
     axes[0, 0].set_title("Top 15 Most Played Games")
-    axes[0, 0].tick_params(axis="x", rotation=60)
+    axes[0, 0].tick_params(axis="x", rotation=75)
     axes[0, 0].yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x/1000)}k"))
 
     # 2) Genre Distribution
