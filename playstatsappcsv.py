@@ -379,7 +379,7 @@ def visualize_dashboard():
             ))
 
         fig2.update_layout(
-            title="Top 10 Games - Peak Players (Last 30 Days)",
+            title="Top 10 Games - Peak Players",
             xaxis_title="Snapshot Time",
             yaxis_title="Peak Players",
             hovermode="x unified",
