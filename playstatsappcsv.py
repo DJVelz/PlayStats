@@ -229,28 +229,84 @@ def visualize_dashboard():
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
 
-    # -------- Plotly Interactive Line Chart (Top 10 over 7 days) --------
+    # -------- Plotly Interactive Line Chart (Top 10 over 30 days) --------
     if len(df["snapshot_time"].unique()) > 1:
-        df["snapshot_time"] = pd.to_datetime(df["snapshot_time"], format='ISO8601', errors='coerce')
-        cutoff = df["snapshot_time"].max() - pd.Timedelta(days=30)
-        recent = df[df["snapshot_time"] >= cutoff]
-        latest_top10 = recent[recent["snapshot_time"] == recent["snapshot_time"].max()]\
-            .sort_values("peak_in_game", ascending=False).head(10)["name"].tolist()
 
-        pivot = recent[recent["name"].isin(latest_top10)].pivot_table(
-            index="snapshot_time", columns="name", values="peak_in_game"
-        ).fillna(method="ffill")
-
-        fig2 = go.Figure()
-        for col in pivot.columns:
-            fig2.add_trace(go.Scatter(x=pivot.index, y=pivot[col],
-                                      mode="lines+markers", name=col))
-        fig2.update_layout(
-            title="Top 10 Games - Peak Players (Last 30 Days)",
-            xaxis_title="Snapshot Time", yaxis_title="Peak Players",
-            hovermode="x unified", legend_title="Game"
+        # --- Timestamp Cleanup for older CSV formats ---
+        df["snapshot_time"] = pd.to_datetime(
+            df["snapshot_time"],
+            errors="coerce",
+            utc=True
         )
+
+        # Drop totally broken rows
+        df = df.dropna(subset=["snapshot_time"])
+        df = df.sort_values("snapshot_time")
+
+        # --- Last 30 days ---
+        cutoff = df["snapshot_time"].max() - pd.Timedelta(days=30)
+        recent = df[df["snapshot_time"] >= cutoff].copy()
+
+        # --- Select Top 10 based on latest snapshot ---
+        latest_time = recent["snapshot_time"].max()
+        latest_top10 = (
+            recent[recent["snapshot_time"] == latest_time]
+            .sort_values("peak_in_game", ascending=False)
+            .head(10)["app_id"]
+            .tolist()
+        )
+
+        # --- Use app_id to avoid name inconsistencies ---
+        recent_top10 = recent[recent["app_id"].isin(latest_top10)]
+
+        # Pivot on app_id but store a name mapping
+        name_map = recent_top10.groupby("app_id")["name"].last()
+
+        pivot = recent_top10.pivot_table(
+            index="snapshot_time",
+            columns="app_id",
+            values="peak_in_game"
+        )
+
+        # --- Smooth the data ---
+        pivot = pivot.resample("D").mean()
+        pivot = pivot.ffill().bfill()
+
+        # --- Create the interactive Fig ---
+        fig2 = go.Figure()
+
+        for app_id in pivot.columns:
+            fig2.add_trace(go.Scatter(
+                x=pivot.index,
+                y=pivot[app_id],
+                mode="lines+markers",
+                name=name_map.get(app_id, f"App {app_id}"),
+                hovertemplate="<b>%{fullData.name}</b><br>"
+                            "Players: %{y:,}<br>"
+                            "Date: %{x|%Y-%m-%d}"
+            ))
+
+        fig2.update_layout(
+            title="Top 10 Games - Peak Players",
+            xaxis_title="Snapshot Time",
+            yaxis_title="Peak Players",
+            hovermode="x unified",
+            legend_title="Game",
+            xaxis=dict(
+                rangeslider=dict(visible=True),
+                rangeselector=dict(
+                    buttons=[
+                        dict(step="day", count=7, label="7D", stepmode="backward"),
+                        dict(step="day", count=14, label="14D", stepmode="backward"),
+                        dict(step="day", count=30, label="30D", stepmode="backward"),
+                        dict(step="all", label="All")
+                    ]
+                )
+            )
+        )
+
         fig2.show()
+
 
 # ---------- Main ----------
 def main():
