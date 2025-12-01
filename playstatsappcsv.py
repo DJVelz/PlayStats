@@ -328,15 +328,15 @@ def visualize_dashboard():
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.show()
 
-    # ---------- Plotly Interactive Line Chart (Top 10 over 30 days) ----------
+    # ---------- Plotly Interactive Line Chart (Top 10 over 90 days) ----------
     # Need at least 2 unique snapshot times
     if df["snapshot_time"].nunique() > 1:
-        # Keep df sorted and limited to last 30 days
+        # Keep df sorted and limited to last 90 days
         df = df.sort_values("snapshot_time")
-        cutoff = df["snapshot_time"].max() - pd.Timedelta(days=30)
+        cutoff = df["snapshot_time"].max() - pd.Timedelta(days=90)
         recent = df[df["snapshot_time"] >= cutoff].copy()
         if recent.empty:
-            logging.info("No recent data in the last 30 days.")
+            logging.info("No recent data in the last 90 days.")
             return
 
         # Remove possible malformed peak values
